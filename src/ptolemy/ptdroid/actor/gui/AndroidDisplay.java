@@ -1,5 +1,5 @@
-/* An Android implementation of the the DisplayInterface 
- that displays input data in a text area on the screen.
+/* An Android implementation of the the DisplayInterface that displays input 
+   data in a text area on the screen.
 
  @Copyright (c) 1998-2010 The Regents of the University of California.
  All rights reserved.
@@ -33,7 +33,6 @@ import ptolemy.actor.injection.PortableContainer;
 import ptolemy.actor.lib.gui.Display;
 import ptolemy.actor.lib.gui.DisplayInterface;
 import ptolemy.kernel.util.IllegalActionException;
-import ptolemy.kernel.util.NameDuplicationException;
 import android.graphics.Color;
 import android.os.Handler;
 import android.os.Message;
@@ -44,25 +43,23 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 ///////////////////////////////////////////////////////////////////
-//// AnroidDisplay
+//// AndroidDisplay
 
 /**
-<p>
-AnroidDisplay is the implementation of the DisplayInterface that uses Android java.  
-Values of the tokens arriving on the input channels in a
-text area on the screen.  Each input token is written on a
-separate line.  The input type can be of any type.
-Thus, string-valued tokens can be used to
-generate arbitrary textual output, at one token per line.
-</p>
-
-@author Ishwinder Singh
-@version $Id: AndroidDisplay.java 152 2011-09-12 17:59:15Z ahuseyno $
-@since Ptolemy II 8.1
-@Pt.ProposedRating Red (ishwinde)
-@Pt.AcceptedRating Red (ishwinde)
-*/
-
+ * <p>
+ * AndroidDisplay is the implementation of the DisplayInterface that uses Android java. 
+ * Values of the tokens arriving on the input channels in a text area on the 
+ * screen.  Each input token is written on a separate line.  The input type 
+ * can be of any type.  Thus, string-valued tokens can be used to generate
+ * arbitrary textual output, at one token per line.
+ * </p>
+ * 
+ * @author Ishwinder Singh
+ * @version $Id: AndroidDisplay.java 158 2011-10-09 15:38:46Z jkillian $
+ * @since Ptolemy II 8.1
+ * @Pt.ProposedRating Red (ishwinde)
+ * @Pt.AcceptedRating Red (ishwinde)
+ */
 public class AndroidDisplay implements DisplayInterface {
 
     ///////////////////////////////////////////////////////////////////
@@ -71,30 +68,29 @@ public class AndroidDisplay implements DisplayInterface {
     /** Append the string value of the token to the text area
      *  on the screen.  Each value is terminated with a newline 
      *  character.
+     *  @param value The value to be displayed.
      */
     public void display(String value) {
-        Message message = _handler.obtainMessage(0, value);
-        _handler.sendMessage(message);
+        _handler.sendMessage(_handler.obtainMessage(0, value));
     }
 
-    /** Free up memory when closing. */
+    /** Free up memory when closing. 
+     */
     public void cleanUp() {
         _textArea.setText("");
     }
 
-    /** Get the TextArea object 
+    /** Get the TextArea object.
+     *  @return The text area object.
      */
     public Object getTextArea() {
         return _textArea;
     }
 
     /** Set the reference to the actor Display actor object.
-    *
-    *  @param displayActor The Display actor 
-    */
-
-    public void init(Display displayActor) throws IllegalActionException,
-            NameDuplicationException {
+     *  @param displayActor The Display actor 
+     */
+    public void init(Display displayActor) {
         _display = displayActor;
     }
 
@@ -107,6 +103,7 @@ public class AndroidDisplay implements DisplayInterface {
         if (title.trim().equals("")) {
             title = _display.getFullName();
         }
+
         setTitle(title);
     }
 
@@ -115,9 +112,8 @@ public class AndroidDisplay implements DisplayInterface {
      *  in a vertical linear layout.
      *
      *  @param portableContainer The container into which to place the text area, or
-     *   null to specify that there is no current container.
+     *  null to specify that there is no current container.
      */
-
     public void place(PortableContainer portableContainer) {
         ViewGroup container = (ViewGroup) (portableContainer != null ? portableContainer
                 .getPlatformContainer() : null);
@@ -141,36 +137,33 @@ public class AndroidDisplay implements DisplayInterface {
                 LinearLayout.LayoutParams.FILL_PARENT));
 
         container.addView(linearLayout, lWidth, lHeight);
-
     }
 
     /** Remove the display from the current container, if there is one.
      */
     public void remove() {
-
     }
 
     /** Set the desired number of rows of the textArea, if there is one.
-     *  
      *  @param numRows The new value of the attribute.
      *  @exception IllegalActionException If the specified attribute
-     *   is <i>rowsDisplayed</i> and its value is not positive.
+     *  is <i>rowsDisplayed</i> and its value is not positive.
      */
-
     public void setRows(int numRows) throws IllegalActionException {
     }
 
     /** Set the desired number of columns of the textArea, if there is one.
-     *  
      *  @param numColumns The new value of the attribute.
      *  @exception IllegalActionException If the specified attribute
-     *   is <i>rowsDisplayed</i> and its value is not positive.
+     *  is <i>rowsDisplayed</i> and its value is not positive.
      */
-
     public void setColumns(int numColumns) throws IllegalActionException {
     }
 
     /** Set the title of the window.
+     *  @param stringValue The string used to set the title.
+     *  @exception IllegalActionException If the expression cannot
+     *  be parsed or cannot be evaluated
      */
     public void setTitle(String stringValue) throws IllegalActionException {
         if (_title != null) {
@@ -182,27 +175,35 @@ public class AndroidDisplay implements DisplayInterface {
 
     ///////////////////////////////////////////////////////////////////
     ////                         private members                   ////
-    /** Reference to the Display actor */
+
+    /** Reference to the Display actor.
+     */
     private Display _display;
-    /** The text area in which the data will be displayed. */
+
+    /** The text area in which the data will be displayed. 
+     */
     private EditText _textArea;
-    /**
-     * The text view displaying display title
+
+    /** The text view displaying display title.
      */
     private TextView _title;
-    /** The handler that runs on the UI thread and updates the text area
-     */
 
     /** Count for number of lines printed.
      */
     private int _count = 100;
 
+    /** The handler that runs on the UI thread and updates the text area.
+     */
     private Handler _handler = new Handler() {
 
+        /** Handle the message by updating the UI.
+         *  @param msg The message sent to the handler.
+         */
         public void handleMessage(Message msg) {
             if (_textArea == null) {
                 return;
             }
+
             String text = msg.obj.toString();
             _textArea.append(text);
 
@@ -216,7 +217,6 @@ public class AndroidDisplay implements DisplayInterface {
                 _textArea.setText("");
                 _count = 100;
             }
-
         }
     };
 };

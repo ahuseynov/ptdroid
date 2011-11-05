@@ -61,7 +61,7 @@ import android.widget.ListView;
  *  and removing servers persistently.
  *   
  *  @author Peter Foldes
- *  @version $Id: ConfigurationActivity.java 152 2011-09-12 17:59:15Z ahuseyno $
+ *  @version $Id: ConfigurationActivity.java 158 2011-10-09 15:38:46Z jkillian $
  *  @since Ptolemy II 8.0
  *  @Pt.ProposedRating Red (pdf)
  *  @Pt.AcceptedRating Red (pdf)
@@ -72,10 +72,10 @@ public class ConfigurationActivity extends ListActivity {
      * Initialize the injection framework.
      */
     static {
-        ActorModuleInitializer.setInitializer(new PtolemyModuleAndroidInitializer());
+        ActorModuleInitializer
+                .setInitializer(new PtolemyModuleAndroidInitializer());
     }
 
-    
     ///////////////////////////////////////////////////////////////////
     ////                public methods                             ////
 
@@ -126,6 +126,7 @@ public class ConfigurationActivity extends ListActivity {
     /** Edit or delete the current list view item depending on
      *  which option is selected from the context menu.
      *  @param item The context menu item that was selected. 
+     *  @return Whether or not the event was responded to and consumed by the handler.
      */
     @Override
     public boolean onContextItemSelected(MenuItem item) {
@@ -205,6 +206,7 @@ public class ConfigurationActivity extends ListActivity {
     ////                private methods                            ////
 
     /** Show the dialog for adding new servers to the application database.
+     *  @param oldServer The server to be edited, null if adding a new one.
      */
     private void _showServerDialog(final Server oldServer) {
         // Set up dialog box.

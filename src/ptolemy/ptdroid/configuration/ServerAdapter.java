@@ -47,7 +47,7 @@ import android.widget.TextView;
  *  includes handling deletion of a server from a list.
  *   
  *  @author Peter Foldes
- *  @version $Id: ServerAdapter.java 149 2011-07-30 01:41:38Z ahuseyno $
+ *  @version $Id: ServerAdapter.java 156 2011-10-09 14:42:58Z jkillian $
  *  @since Ptolemy II 8.0
  *  @Pt.ProposedRating Red (pdf)
  *  @Pt.AcceptedRating Red (pdf)
@@ -157,7 +157,8 @@ public class ServerAdapter extends ArrayAdapter<Server> {
     }
 
     /** Update the server record in the database and refresh the list.
-     *  @param server Updated server information that should be persisted.
+     *  @param oldServer Old server information that should be removed from display.
+     *  @param newServer New server information that should be persisted and replaced on screen.
      *  @exception Exception If the server could not be updated in the persistent
      *  storage.
      */

@@ -26,26 +26,27 @@
 
 package ptolemy.ptdroid.actor.lib;
 
-///////////////////////////////////////////////////////////////////
-//// TextFieldContainerInterface
-
 import ptolemy.actor.injection.PortableContainer;
 import ptolemy.actor.lib.TextFieldContainerInterface;
 import ptolemy.data.Token;
 import android.view.ViewGroup;
 import android.widget.EditText;
 
-/**
-Android implementation of the TextFieldContainerInterface 
+///////////////////////////////////////////////////////////////////
+////TextFieldContainerInterface
 
-@author Ishwinder Singh
-@version $Id: TextFieldContainerAndroid.java 152 2011-09-12 17:59:15Z ahuseyno $
-@since @since Ptolemy II 8.1
-@Pt.ProposedRating Red (ishwinde)
-@Pt.AcceptedRating Red (ishwinde)
-*/
-
+/** Android implementation of the TextFieldContainerInterface.
+ *
+ *  @author Ishwinder Singh
+ *  @version $Id: TextFieldContainerAndroid.java 158 2011-10-09 15:38:46Z jkillian $
+ *  @since @since Ptolemy II 8.1
+ *  @Pt.ProposedRating Red (ishwinde)
+ *  @Pt.AcceptedRating Red (ishwinde)
+ */
 public class TextFieldContainerAndroid implements TextFieldContainerInterface {
+
+    ///////////////////////////////////////////////////////////////////
+    ////                         public methods                    ////
 
     /** Place the visual representation of the actor into the specified container.
      *  @param container The container in which to place the object
@@ -58,8 +59,8 @@ public class TextFieldContainerAndroid implements TextFieldContainerInterface {
         _editText.setClickable(false);
     }
 
-    /** Set the text to the value of the parameter
-     * @param value The Parameter containing the value
+    /** Set the text to the value of the parameter.
+     *  @param value The Parameter containing the value
      */
     public synchronized void setValue(Token value) {
         _lastToken = value;
@@ -74,8 +75,8 @@ public class TextFieldContainerAndroid implements TextFieldContainerInterface {
                             _editText.setText(_lastToken.toString());
                         }
                     }
-
                 });
+
                 _messagePosted = true;
             }
         }
@@ -84,10 +85,15 @@ public class TextFieldContainerAndroid implements TextFieldContainerInterface {
     ///////////////////////////////////////////////////////////////////
     ////                         private variables                 ////
 
-    // Text field for displaying the value
+    /** Text field for displaying the value
+     */
     private EditText _editText;
 
+    /** Last token received.
+     */
     private Token _lastToken;
-    private boolean _messagePosted = false;
 
+    /** Whether or not the message has been posted yet.
+     */
+    private boolean _messagePosted = false;
 }

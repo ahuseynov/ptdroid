@@ -132,10 +132,8 @@
 	<path id="jar.libs.ref">
 		<fileset dir="${jar.libs.absolute.dir}" includes="*.jar" />
 		<path refid="project.libraries.jars" />
-		<pathelement location="lib/guice-3.0-no_aop.jar" />
 		<pathelement location="ptbin/" />
 		<pathelement location="lib/hessdroid.jar" />
-		<pathelement location="lib/javax.inject.jar" />
 		<pathelement location="lib/wmqtt.jar" />
 	</path>
 

@@ -31,9 +31,9 @@ package ptolemy.ptdroid.actor;
 
 import java.util.ResourceBundle;
 
+import ptolemy.actor.injection.ActorModuleInitializer.Initializer;
 import ptolemy.actor.injection.PtolemyInjector;
 import ptolemy.actor.injection.PtolemyModule;
-import ptolemy.actor.injection.ActorModuleInitializer.Initializer;
 
 ///////////////////////////////////////////////////////////////////
 //// PtolemyModuleJavaSEInitializer
@@ -42,7 +42,7 @@ import ptolemy.actor.injection.ActorModuleInitializer.Initializer;
  * implementation mappings.  The module uses ptolemy.actor.JavaSEActorModule.properties
  * file to initialize the PtolemyModule.
  * @author Anar Huseynov
- * @version $Id: PtolemyModuleAndroidInitializer.java 154 2011-09-30 19:48:35Z ahuseyno $ 
+ * @version $Id: PtolemyModuleAndroidInitializer.java 158 2011-10-09 15:38:46Z jkillian $ 
  * @since Ptolemy II 8.0
  * @Pt.ProposedRating Red (ahuseyno)
  * @Pt.AcceptedRating Red (ahuseyno)
@@ -60,6 +60,9 @@ public class PtolemyModuleAndroidInitializer implements Initializer {
 
     ///////////////////////////////////////////////////////////////////
     ////                         private variables                 ////
+
+    /** Reference to the Ptolemy injection resource bundles.
+     */
     private static final PtolemyModule[] PTOLEMY_MODULES = {
             new PtolemyModule(
                     ResourceBundle
@@ -67,5 +70,4 @@ public class PtolemyModuleAndroidInitializer implements Initializer {
             new PtolemyModule(
                     ResourceBundle
                             .getBundle("ptolemy.ptdroid.simulation.AndroidSimulationModule")) };
-
 }
