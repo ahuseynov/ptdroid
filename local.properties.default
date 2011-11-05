@@ -1,0 +1,3 @@
+# Create a copy of this file and call it local.properties . 
+# Point sdk.dir to the directory where android sdk is installed.
+sdk.dir=/Library/Android/android-sdk-mac_86

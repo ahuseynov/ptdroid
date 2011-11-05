@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/edit_server"
+          android:title="@string/server_list_edit" />
+	<item android:id="@+id/delete_server"
+          android:title="@string/server_list_delete" />
+</menu>

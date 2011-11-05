@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="app_name">Ptolemy on Android</string>
+	<string name="play_caption">Play</string>
+	<string name="pause_caption">Pause</string>
+	<string name="stop_caption">Stop</string>
+	<string name="view_caption">View</string>
+	<string name="server_delete_confirm_header">Please Confirm</string>
+	<string name="server_list_header">Available Servers</string>
+	<string name="server_list_add">Add Server</string>
+	<string name="server_list_edit">Edit</string>
+	<string name="server_list_delete">Delete</string>
+	<string name="model_list_header">Select a Model</string>
+	<string name="layout_list_header">Select a Layout</string>	
+	<string name="add_server_header">Server Configuration</string>
+	<string name="add_server_address">Address</string>
+	<string name="add_server_port">Port</string>
+	<string name="add_server_username">Username</string>
+	<string name="add_server_password">Password</string>    
+	<string name="add_server_save">Save Settings</string>
+</resources>

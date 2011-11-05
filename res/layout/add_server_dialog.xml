@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/add_server"
+	android:gravity="center" 
+	android:orientation="vertical"
+	android:layout_height="wrap_content" 
+	android:layout_width="wrap_content">
+	<TableLayout 
+		android:stretchColumns="1" 
+		android:gravity="center" 
+		android:orientation="vertical"
+		android:layout_height="wrap_content" 
+		android:layout_width="wrap_content">
+    	<TableRow>
+        	<TextView
+				android:text="@string/add_server_address"
+				android:padding="3dip"
+				android:layout_height="40dip" />
+        	<EditText
+				android:id="@+id/server_address"
+				android:text=""
+				android:inputType="textNoSuggestions"
+				android:gravity="right"
+				android:padding="3dip"
+				android:layout_height="40dip" />
+	    </TableRow>
+	    <TableRow>
+        	<TextView
+				android:text="@string/add_server_port"
+				android:padding="3dip"
+				android:layout_height="40dip" />            
+	        <EditText	        	
+				android:id="@+id/server_port"
+				android:text=""
+				android:inputType="number"
+				android:gravity="right"
+				android:padding="3dip"
+				android:layout_height="40dip" />
+    	</TableRow>
+    	<TableRow>
+	        <TextView
+				android:text="@string/add_server_username"
+				android:padding="3dip"
+				android:layout_height="40dip"/>
+	        <EditText
+				android:id="@+id/server_username"
+				android:text=""
+				android:inputType="textNoSuggestions"
+				android:gravity="right"
+				android:padding="3dip"
+				android:layout_height="40dip"/>
+    	</TableRow>
+	    <TableRow>
+	        <TextView
+				android:text="@string/add_server_password"
+				android:padding="3dip"
+				android:layout_height="40dip"/>
+	        <EditText
+				android:id="@+id/server_password"
+				android:text=""
+				android:inputType="textPassword"
+				android:gravity="right"
+				android:padding="3dip"
+				android:layout_height="40dip" />
+	    </TableRow>
+	</TableLayout>
+	<Button
+		android:id="@+id/server_save"
+		android:text="@string/add_server_save"
+		android:layout_gravity="right"
+		android:layout_height="wrap_content"
+		android:layout_width="wrap_content" />
+</LinearLayout>

@@ -1,0 +1,9 @@
+.svn
+.class
+.settings
+bin
+gen
+tempoutput
+ptbin
+local.properties
+
