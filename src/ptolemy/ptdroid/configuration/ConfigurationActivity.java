@@ -31,10 +31,6 @@
  */
 package ptolemy.ptdroid.configuration;
 
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-
 import ptolemy.actor.injection.ActorModuleInitializer;
 import ptolemy.ptdroid.R;
 import ptolemy.ptdroid.actor.PtolemyModuleAndroidInitializer;
@@ -61,7 +57,7 @@ import android.widget.ListView;
  *  and removing servers persistently.
  *   
  *  @author Peter Foldes
- *  @version $Id: ConfigurationActivity.java 158 2011-10-09 15:38:46Z jkillian $
+ *  @version $Id: ConfigurationActivity.java 166 2011-11-13 22:02:55Z ishwinde $
  *  @since Ptolemy II 8.0
  *  @Pt.ProposedRating Red (pdf)
  *  @Pt.AcceptedRating Red (pdf)
@@ -78,6 +74,16 @@ public class ConfigurationActivity extends ListActivity {
 
     ///////////////////////////////////////////////////////////////////
     ////                public methods                             ////
+
+    /** Back out of the application and cancel any pending callbacks.
+     *  @see android.app.Activity#onBackPressed()
+     */
+    @Override
+    public void onBackPressed() {
+
+        finish();
+        return;
+    }
 
     /** Show the server selection menu.
      *  @param savedInstanceState State of the saved instance in the 
@@ -166,40 +172,41 @@ public class ConfigurationActivity extends ListActivity {
     @Override
     protected void onListItemClick(ListView listView, View view, int position,
             long id) {
-        try {
-            // Get the current selection.
-            Object item = listView.getItemAtPosition(position);
-            if (item instanceof Server) {
+        //try {
+        // Get the current selection.
+        Object item = listView.getItemAtPosition(position);
+        if (item instanceof Server) {
 
-                // Determine if the selected host is reachable.
-                if (InetAddress.getByName(((Server) item).getAddress())
-                        .isReachable(2000) == false) {
-                    DialogFactory.getError(
-                            this,
-                            "Connection Error",
-                            "The server could not be reached at: "
-                                    + ((Server) item).getAddress()).show();
-                    return;
-                }
+            // Determine if the selected host is reachable.
+            //                if (InetAddress.getByName(((Server) item).getAddress())
+            //                        .isReachable(2000) == false) {
+            //                    DialogFactory.getError(
+            //                            this,
+            //                            "Connection Error",
+            //                            "The server could not be reached at: "
+            //                                    + ((Server) item).getAddress()).show();
+            //                    return;
+            //                }
 
-                // Proceed to the next intent with the selected server.
-                Intent intent = new Intent(getApplicationContext(),
-                        ModelSelectionActivity.class);
-                intent.putExtra("address", ((Server) item).toString());
-                intent.putExtra("username", ((Server) item).getUsername());
-                intent.putExtra("password", ((Server) item).getPassword());
+            // Proceed to the next intent with the selected server.
+            Intent intent = new Intent(getApplicationContext(),
+                    ModelSelectionActivity.class);
+            intent.putExtra("address", ((Server) item).toString());
+            intent.putExtra("username", ((Server) item).getUsername());
+            intent.putExtra("password", ((Server) item).getPassword());
 
-                startActivity(intent);
-            }
-        } catch (UnknownHostException e) {
-            Log.e(this.getClass().getName(), e.getMessage());
-            DialogFactory.getError(this, "Connection Error",
-                    "Host is unknown: " + e.getMessage()).show();
-        } catch (IOException e) {
-            Log.e(this.getClass().getName(), e.getMessage());
-            DialogFactory.getError(this, "Connection Error", e.getMessage())
-                    .show();
+            startActivity(intent);
         }
+        //            }
+        //        } catch (UnknownHostException e) {
+        //            Log.e(this.getClass().getName(), e.getMessage());
+        //            DialogFactory.getError(this, "Connection Error",
+        //                    "Host is unknown: " + e.getMessage()).show();
+        //        } catch (IOException e) {
+        //            Log.e(this.getClass().getName(), e.getMessage());
+        //            DialogFactory.getError(this, "Connection Error", e.getMessage())
+        //                    .show();
+        //        }
     }
 
     ///////////////////////////////////////////////////////////////////

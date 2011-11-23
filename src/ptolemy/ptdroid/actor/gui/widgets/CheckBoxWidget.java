@@ -41,12 +41,11 @@ import android.widget.CheckBox;
  *   using the place method.
  *
  *  @author Ishwinder Singh
- *  @version $Id: CheckBoxWidget.java 152 2011-09-12 17:59:15Z ahuseyno $
+ *  @version $Id: CheckBoxWidget.java 169 2011-11-20 19:40:11Z jkillian $
  *  @since Ptolemy II 8.1
  *  @Pt.ProposedRating Red (ishwinde)
  *  @Pt.AcceptedRating Red (ishwinde)
  */
-
 public class CheckBoxWidget implements PortablePlaceable,
         PtolemyAndroidWidget<Boolean, TextWatcher> {
 
@@ -83,7 +82,7 @@ public class CheckBoxWidget implements PortablePlaceable,
      *  @param listener The listener object to remove from the widget.
      */
     public void removeListener(TextWatcher listener) {
-        _checkBox.addTextChangedListener(listener);
+        _checkBox.removeTextChangedListener(listener);
     }
 
     /** Set the the state of the checkbox.
@@ -91,7 +90,9 @@ public class CheckBoxWidget implements PortablePlaceable,
      *  @param value The boolean value to be set in the CheckBox.
      */
     public void setValue(Boolean value) {
-        _checkBox.setChecked(value);
+        if (value instanceof Boolean) {
+            _checkBox.setChecked(value);
+        }
     }
 
     ////////////////////////////////////////////////////////////////    
@@ -100,5 +101,4 @@ public class CheckBoxWidget implements PortablePlaceable,
     /** The CheckBox object to be placed in the container.
      */
     private CheckBox _checkBox;
-
 }

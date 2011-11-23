@@ -48,8 +48,8 @@ import android.util.Log;
  *  persistent layer implementation.
  *   
  *  @author Peter Foldes
- *  @version $Id: ConnectionManager.java 149 2011-07-30 01:41:38Z ahuseyno $
- *  @since Ptolemy II 8.0
+ *  @version $Id: ConnectionManager.java 167 2011-11-20 19:24:03Z jkillian $
+ *  @since Ptolemy II 8.1
  *  @Pt.ProposedRating Red (pdf)
  *  @Pt.AcceptedRating Red (pdf)
  */

@@ -40,12 +40,11 @@ import android.widget.TextView;
 /** Represents a TextView widget to be placed on the Android user interface.
 *
 *  @author Ishwinder Singh
-*  @version $Id: TextViewWidget.java 152 2011-09-12 17:59:15Z ahuseyno $
+*  @version $Id: TextViewWidget.java 170 2011-11-20 19:42:11Z jkillian $
 *  @since Ptolemy II 8.1
 *  @Pt.ProposedRating Red (ishwinde)
 *  @Pt.AcceptedRating Red (ishwinde)
 */
-
 public class TextViewWidget implements PortablePlaceable,
         PtolemyAndroidWidget<String, TextWatcher> {
 
@@ -101,7 +100,9 @@ public class TextViewWidget implements PortablePlaceable,
      *  @param listener The listener object to remove from the widget.
      */
     public void removeListener(TextWatcher listener) {
-        _textView.addTextChangedListener(listener);
+        if (listener instanceof TextWatcher) {
+            _textView.removeTextChangedListener(listener);
+        }
     }
 
     ////////////////////////////////////////////////////////////////    

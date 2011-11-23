@@ -40,12 +40,11 @@ import android.widget.EditText;
 /** Represents a EditText widget to be placed on the Android user interface.
 *
 *  @author Ishwinder Singh
-*  @version $Id: EditTextWidget.java 152 2011-09-12 17:59:15Z ahuseyno $
+*  @version $Id: EditTextWidget.java 169 2011-11-20 19:40:11Z jkillian $
 *  @since Ptolemy II 8.1
 *  @Pt.ProposedRating Red (ishwinde)
 *  @Pt.AcceptedRating Red (ishwinde)
 */
-
 public class EditTextWidget implements PortablePlaceable,
         PtolemyAndroidWidget<String, OnFocusChangeListener> {
 
@@ -110,5 +109,4 @@ public class EditTextWidget implements PortablePlaceable,
     /** The EditText object to be placed in the container.
      */
     private EditText _editText;
-
 }

@@ -49,7 +49,7 @@ import android.view.MotionEvent;
  *  process.
  * 
  *  @author Peter Foldes
- *  @version $Id: PtolemyActivity.java 152 2011-09-12 17:59:15Z ahuseyno $ 
+ *  @version $Id: PtolemyActivity.java 166 2011-11-13 22:02:55Z ishwinde $ 
  *  @since Ptolemy II 8.0
  *  @Pt.ProposedRating Red (pdf)
  *  @Pt.AcceptedRating Red (pdf)
@@ -60,9 +60,10 @@ public class PtolemyActivity extends Activity {
      * Initialize the injection framework.
      */
     static {
-        ActorModuleInitializer.setInitializer(new PtolemyModuleAndroidInitializer());
+        ActorModuleInitializer
+                .setInitializer(new PtolemyModuleAndroidInitializer());
     }
-    
+
     ///////////////////////////////////////////////////////////////////
     ////                public methods                             ////
 
@@ -76,18 +77,32 @@ public class PtolemyActivity extends Activity {
         // Set up the workspace.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.splash);
+        _launched = false;
 
         // Initialize the timed transition into the configuration.
         _runnable = new Runnable() {
             public void run() {
-                startActivity(new Intent(getBaseContext(),
-                        ConfigurationActivity.class));
+                synchronized (PtolemyActivity.this) {
+                    if (!_launched) {
+                        startActivity(new Intent(getBaseContext(),
+                                ConfigurationActivity.class));
+                        _launched = true;
+                        finish();
+                    }
+                }
             }
         };
 
         // Start the timed transition.
         _handler = new Handler();
         _handler.postDelayed(_runnable, DELAY);
+    }
+
+    @Override
+    protected synchronized void onResume() {
+        super.onResume();
+        _launched = false;
+
     }
 
     /** In case the Ptolemy application gets back to this first screen,
@@ -98,14 +113,17 @@ public class PtolemyActivity extends Activity {
      *  @see android.app.Activity#onTouchEvent(android.view.MotionEvent)
      */
     @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        // Cancel the runnable callback.
-        _handler.removeCallbacks(_runnable);
+    public synchronized boolean onTouchEvent(MotionEvent event) {
 
         // Start the next activity.
         boolean isConsumed = false;
         try {
-            startActivity(new Intent(this, ConfigurationActivity.class));
+            if (!_launched) {
+                startActivity(new Intent(this, ConfigurationActivity.class));
+                _launched = true;
+                finish();
+            }
+
             isConsumed = true;
         } catch (Exception e) {
             isConsumed = false;
@@ -124,6 +142,7 @@ public class PtolemyActivity extends Activity {
 
         // Leave the application.
         super.onBackPressed();
+        finish();
     }
 
     ///////////////////////////////////////////////////////////////////
@@ -139,6 +158,9 @@ public class PtolemyActivity extends Activity {
 
     /** The delay in milliseconds before switching to the next activity.
      */
-    private final int DELAY = 2000;
-    
+    private final int DELAY = 1000;
+
+    /** Whether or not the activity was launched or retrieved from backstack.
+     */
+    private boolean _launched = false;
 }

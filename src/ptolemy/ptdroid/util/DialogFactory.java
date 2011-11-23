@@ -39,8 +39,8 @@ import android.content.DialogInterface;
 /** The static class for creating alert dialog windows with custom title and message.
  *
  *  @author Justin Killian
- *  @version $Id: DialogFactory.java 152 2011-09-12 17:59:15Z ahuseyno $
- *  @since Ptolemy II 8.0
+ *  @version $Id: DialogFactory.java 173 2011-11-20 19:55:45Z jkillian $
+ *  @since Ptolemy II 8.1
  *  @Pt.ProposedRating Red (jkillian)
  *  @Pt.AcceptedRating Red (jkillian)
  */

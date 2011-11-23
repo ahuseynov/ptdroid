@@ -1,4 +1,4 @@
-/* A labeled box for signal plots.  This is Android port of the ptolemy.plot.PlotBox class.
+/* A labeled box for signal plots.  This is the Android port of the ptolemy.plot.PlotBox class.
 
  @Copyright (c) 1997-2010 The Regents of the University of California.
  All rights reserved.
@@ -63,7 +63,6 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 
 // TO DO:
@@ -220,7 +219,7 @@ import android.widget.ImageView;
 
  @author Edward A. Lee, Christopher Brooks, Contributors: Jun Wu (jwu@inin.com.au), William Wu, Robert Kroeger, Tom Peachey, Bert Rodiers
 
- @version $Id: PlotBox.java 152 2011-09-12 17:59:15Z ahuseyno $
+ @version $Id: PlotBox.java 171 2011-11-20 19:45:16Z ahuseyno $
  @since Ptolemy II 0.2
  @Pt.ProposedRating Yellow (cxh)
  @Pt.AcceptedRating Yellow (cxh)
@@ -543,34 +542,34 @@ public class PlotBox extends ImageView implements PlotBoxInterface {
         setTimedRepaint(false);
 
         // Remove the buttons
-        if (_printButton != null) {
-            // ActionListener[] listeners = _printButton.getActionListeners();
-            // for (int i = 0; i < listeners.length; i++) {
-            // _printButton.removeActionListener(listeners[i]);
-            // }
-            _printButton = null;
-        }
-        if (_resetButton != null) {
-            // ActionListener[] listeners = _resetButton.getActionListeners();
-            // for (int i = 0; i < listeners.length; i++) {
-            // _resetButton.removeActionListener(listeners[i]);
-            // }
-            _resetButton = null;
-        }
-        if (_formatButton != null) {
-            // ActionListener[] listeners = _formatButton.getActionListeners();
-            // for (int i = 0; i < listeners.length; i++) {
-            // _formatButton.removeActionListener(listeners[i]);
-            // }
-            _formatButton = null;
-        }
-        if (_fillButton != null) {
-            // ActionListener[] listeners = _fillButton.getActionListeners();
-            // for (int i = 0; i < listeners.length; i++) {
-            // _fillButton.removeActionListener(listeners[i]);
-            // }
-            _fillButton = null;
-        }
+//        if (_printButton != null) {
+//            // ActionListener[] listeners = _printButton.getActionListeners();
+//            // for (int i = 0; i < listeners.length; i++) {
+//            // _printButton.removeActionListener(listeners[i]);
+//            // }
+//            _printButton = null;
+//        }
+//        if (_resetButton != null) {
+//            // ActionListener[] listeners = _resetButton.getActionListeners();
+//            // for (int i = 0; i < listeners.length; i++) {
+//            // _resetButton.removeActionListener(listeners[i]);
+//            // }
+//            _resetButton = null;
+//        }
+//        if (_formatButton != null) {
+//            // ActionListener[] listeners = _formatButton.getActionListeners();
+//            // for (int i = 0; i < listeners.length; i++) {
+//            // _formatButton.removeActionListener(listeners[i]);
+//            // }
+//            _formatButton = null;
+//        }
+//        if (_fillButton != null) {
+//            // ActionListener[] listeners = _fillButton.getActionListeners();
+//            // for (int i = 0; i < listeners.length; i++) {
+//            // _fillButton.removeActionListener(listeners[i]);
+//            // }
+//            _fillButton = null;
+//        }
 
         // removeAll();
     }
@@ -2563,7 +2562,7 @@ public class PlotBox extends ImageView implements PlotBoxInterface {
                 canvas.drawLine(_lrx, yCoord1, xCoord2, yCoord1, paint);
 
                 if (_grid && (yCoord1 != _uly) && (yCoord1 != _lry)) {
-                    paint.setColor(Color.GRAY);
+                    paint.setColor(Color.LTGRAY);
                     canvas.drawLine(xCoord1, yCoord1, xCoord2, yCoord1, paint);
                     paint.setColor(_foreground);
                 }
@@ -2596,7 +2595,7 @@ public class PlotBox extends ImageView implements PlotBoxInterface {
                                 - (int) ((ypos - _ytickMin) * _ytickscale);
 
                         if (_grid && (yCoord1 != _uly) && (yCoord1 != _lry)) {
-                            paint.setColor(Color.GRAY);
+                            paint.setColor(Color.LTGRAY);
                             canvas.drawLine(_ulx + 1, yCoord1, _lrx - 1,
                                     yCoord1, paint);
                             paint.setColor(_foreground);
@@ -2643,7 +2642,7 @@ public class PlotBox extends ImageView implements PlotBoxInterface {
                 canvas.drawLine(_lrx, yCoord1, xCoord2, yCoord1, paint);
 
                 if (_grid && (yCoord1 != _uly) && (yCoord1 != _lry)) {
-                    paint.setColor(Color.GRAY);
+                    paint.setColor(Color.LTGRAY);
                     canvas.drawLine(xCoord1, yCoord1, xCoord2, yCoord1, paint);
                     paint.setColor(_foreground);
                 }
@@ -2748,7 +2747,7 @@ public class PlotBox extends ImageView implements PlotBoxInterface {
                 canvas.drawLine(xCoord1, _lry, xCoord1, yCoord2, paint);
 
                 if (_grid && (xCoord1 != _ulx) && (xCoord1 != _lrx)) {
-                    paint.setColor(Color.GRAY);
+                    paint.setColor(Color.LTGRAY);
                     canvas.drawLine(xCoord1, yCoord1, xCoord1, yCoord2, paint);
                     paint.setColor(_foreground);
                 }
@@ -2783,7 +2782,7 @@ public class PlotBox extends ImageView implements PlotBoxInterface {
                                 + (int) ((xpos - _xtickMin) * _xtickscale);
 
                         if (_grid && (xCoord1 != _ulx) && (xCoord1 != _lrx)) {
-                            paint.setColor(Color.GRAY);
+                            paint.setColor(Color.LTGRAY);
                             canvas.drawLine(xCoord1, _uly + 1, xCoord1,
                                     _lry - 1, paint);
                             paint.setColor(_foreground);
@@ -2841,7 +2840,7 @@ public class PlotBox extends ImageView implements PlotBoxInterface {
 
                     // Draw the grid line
                     if (_grid && (xCoord1 != _ulx) && (xCoord1 != _lrx)) {
-                        paint.setColor(Color.GRAY);
+                        paint.setColor(Color.LTGRAY);
                         canvas.drawLine(xCoord1, yCoord1, xCoord1, yCoord2,
                                 paint);
                         paint.setColor(_foreground);
@@ -3291,7 +3290,7 @@ public class PlotBox extends ImageView implements PlotBoxInterface {
     protected Integer _background = Color.WHITE;
 
     /** Color of the foreground, settable from HTML. */
-    protected Integer _foreground = Color.GRAY;
+    protected Integer _foreground = Color.LTGRAY;
 
     /**
      * Top padding. Derived classes can increment these to make space around the
@@ -4446,10 +4445,10 @@ public class PlotBox extends ImageView implements PlotBoxInterface {
     private Vector _yticklabels = null;
 
     // A button for filling the plot
-    private transient Button _fillButton = null;
+//    private transient Button _fillButton = null;
 
     // A button for formatting the plot
-    private transient Button _formatButton = null;
+//    private transient Button _formatButton = null;
 
     // Indicator of whether X and Y range has been first specified.
     boolean _originalXRangeGiven = false;
@@ -4470,10 +4469,10 @@ public class PlotBox extends ImageView implements PlotBoxInterface {
     double _originalYhigh = 0.0;
 
     // A button for printing the plot
-    private transient Button _printButton = null;
+//    private transient Button _printButton = null;
 
     // A button for filling the plot
-    private transient Button _resetButton = null;
+//    private transient Button _resetButton = null;
 
     // True when repainting should be performed by a timed thread.
     private boolean _timedRepaint = false;

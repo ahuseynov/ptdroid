@@ -1,4 +1,5 @@
-/* Define calls for common portable widgets.
+/* Define interface for common portable widgets that will be visualized
+   on the Android UI.
 
  Copyright (c) 2011 The Regents of the University of California.
  All rights reserved.
@@ -33,7 +34,7 @@ package ptolemy.ptdroid.actor.gui.widgets;
 /** Define calls for common portable widgets.
  *
  *  @author Peter Foldes
- *  @version $Id: PtolemyAndroidWidget.java 149 2011-07-30 01:41:38Z ahuseyno $
+ *  @version $Id$
  *  @since Ptolemy II 8.1
  *  @Pt.ProposedRating Red (pdf)
  *  @Pt.AcceptedRating Red (pdf)

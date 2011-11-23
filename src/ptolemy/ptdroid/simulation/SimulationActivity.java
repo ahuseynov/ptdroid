@@ -31,6 +31,8 @@ package ptolemy.ptdroid.simulation;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import ptolemy.actor.CompositeActor;
 import ptolemy.actor.Manager;
@@ -59,6 +61,7 @@ import ptserver.communication.ProxyModelAdapter;
 import ptserver.communication.ProxyModelInfrastructure;
 import ptserver.communication.ProxyModelResponse;
 import ptserver.control.IServerManager;
+import ptserver.control.PtolemyServer;
 import ptserver.control.Ticket;
 import ptserver.data.RemoteEventToken;
 import ptserver.data.TokenParser;
@@ -86,7 +89,7 @@ import com.caucho.hessian.client.HessianProxyFactory;
  *  a simulation as well as view the visual output of graphical sink actors.
  *
  *  @author Justin Killian
- *  @version $Id: SimulationActivity.java 155 2011-10-08 18:45:00Z ahuseyno $
+ *  @version $Id: SimulationActivity.java 171 2011-11-20 19:45:16Z ahuseyno $
  *  @since Ptolemy II 8.0
  *  @Pt.ProposedRating Red (jkillian)
  *  @Pt.AcceptedRating Red (jkillian)
@@ -100,6 +103,7 @@ public class SimulationActivity extends Activity implements
     static {
         ActorModuleInitializer
                 .setInitializer(new PtolemyModuleAndroidInitializer());
+        Logger.getLogger("PtolemyServer").setLevel(Level.SEVERE);
     }
 
     ///////////////////////////////////////////////////////////////////
@@ -226,6 +230,9 @@ public class SimulationActivity extends Activity implements
         _localModel.setUpInfrastructure(_response.getTicket(),
                 _response.getBrokerUrl());
         _localModel.addProxyModelListener(new ProxyModelAdapter() {
+
+            private boolean hasFired = false;
+
             @Override
             public void modelConnectionExpired(
                     ProxyModelInfrastructure proxyModelInfrastructure) {
@@ -237,7 +244,10 @@ public class SimulationActivity extends Activity implements
             public void modelException(
                     ProxyModelInfrastructure proxyModelInfrastructure,
                     String message, Throwable exception) {
-                _handleFatalError(exception);
+                if (!hasFired) {
+                    hasFired = true;
+                    _handleFatalError(exception);
+                }
             }
 
             @Override
@@ -328,7 +338,7 @@ public class SimulationActivity extends Activity implements
                             pauseButton.setEnabled(true);
                             stopButton.setEnabled(true);
 
-                            Toast.makeText(getBaseContext(),
+                            Toast.makeText(SimulationActivity.this,
                                     "Simulation started.", Toast.LENGTH_SHORT)
                                     .show();
                         }
@@ -340,8 +350,9 @@ public class SimulationActivity extends Activity implements
                         pauseButton.setEnabled(true);
                         stopButton.setEnabled(true);
 
-                        Toast.makeText(getBaseContext(), "Simulation resumed.",
-                                Toast.LENGTH_SHORT).show();
+                        Toast.makeText(SimulationActivity.this,
+                                "Simulation resumed.", Toast.LENGTH_SHORT)
+                                .show();
                     }
                 } catch (Throwable e) {
                     _handleFatalError(e);
@@ -360,8 +371,9 @@ public class SimulationActivity extends Activity implements
                         pauseButton.setEnabled(false);
                         stopButton.setEnabled(true);
 
-                        Toast.makeText(getBaseContext(), "Simulation paused.",
-                                Toast.LENGTH_SHORT).show();
+                        Toast.makeText(SimulationActivity.this,
+                                "Simulation paused.", Toast.LENGTH_SHORT)
+                                .show();
                     }
                 } catch (Throwable e) {
                     _handleFatalError(e);
@@ -380,8 +392,9 @@ public class SimulationActivity extends Activity implements
                         pauseButton.setEnabled(false);
                         stopButton.setEnabled(false);
 
-                        Toast.makeText(getBaseContext(), "Simulation stopped.",
-                                Toast.LENGTH_SHORT).show();
+                        Toast.makeText(SimulationActivity.this,
+                                "Simulation stopped.", Toast.LENGTH_SHORT)
+                                .show();
                     }
                 } catch (Throwable e) {
                     _handleFatalError(e);
@@ -398,7 +411,7 @@ public class SimulationActivity extends Activity implements
         }, 100);
     }
 
-    private synchronized void _handleFatalError(final Throwable throwable) {   
+    private synchronized void _handleFatalError(final Throwable throwable) {
         Log.e(getClass().getName(), throwable.getMessage(), throwable);
         if (!_handlingFatalError) {
             _handlingFatalError = true;
@@ -419,8 +432,8 @@ public class SimulationActivity extends Activity implements
                             .setCancelable(false)
                             .setPositiveButton("OK",
                                     new DialogInterface.OnClickListener() {
-                                        public void onClick(DialogInterface dialog,
-                                                int id) {
+                                        public void onClick(
+                                                DialogInterface dialog, int id) {
                                             dialog.dismiss();
                                             _cleanUp();
                                             finish();

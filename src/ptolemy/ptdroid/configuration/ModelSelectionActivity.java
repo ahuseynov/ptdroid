@@ -29,9 +29,14 @@
 package ptolemy.ptdroid.configuration;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.InetAddress;
 import java.net.MalformedURLException;
+import java.net.UnknownHostException;
 
 import ptolemy.actor.injection.ActorModuleInitializer;
+import ptolemy.kernel.util.IllegalActionException;
+import ptolemy.kernel.util.KernelException;
 import ptolemy.ptdroid.R;
 import ptolemy.ptdroid.actor.PtolemyModuleAndroidInitializer;
 import ptolemy.ptdroid.simulation.SimulationActivity;
@@ -59,21 +64,20 @@ import com.caucho.hessian.client.HessianProxyFactory;
  *  layouts.
  *   
  *  @author Peter Foldes
- *  @version $Id: ModelSelectionActivity.java 152 2011-09-12 17:59:15Z ahuseyno $
- *  @since Ptolemy II 8.0
+ *  @version $Id: ModelSelectionActivity.java 174 2011-11-21 04:11:08Z jkillian $
+ *  @since Ptolemy II 8.1
  *  @Pt.ProposedRating Red (pdf)
  *  @Pt.AcceptedRating Red (pdf)
  */
 public class ModelSelectionActivity extends ListActivity {
 
-    /** 
-     * Initialize the injection framework.
+    /** Initialize the injection framework.
      */
     static {
-        ActorModuleInitializer.setInitializer(new PtolemyModuleAndroidInitializer());
+        ActorModuleInitializer
+                .setInitializer(new PtolemyModuleAndroidInitializer());
     }
 
-    
     ///////////////////////////////////////////////////////////////////
     ////                public methods                             ////
 
@@ -101,11 +105,8 @@ public class ModelSelectionActivity extends ListActivity {
                     getIntent().getStringExtra("password"));
             _state = ModelSelectionState.SelectingModel;
             _setupList();
-        } catch (Exception e) {
-            Log.e(getClass().getName(),
-                    "A problem has occurred: " + e.getMessage());
-            DialogFactory.getError(this, "Configuration Error", e.getMessage())
-                    .show();
+        } catch (Throwable e) {
+            _handleFatalError(e);
         }
     }
 
@@ -124,7 +125,11 @@ public class ModelSelectionActivity extends ListActivity {
 
             _modelUrl = "";
             _state = ModelSelectionState.SelectingModel;
-            _setupList();
+            try {
+                _setupList();
+            } catch (Throwable e) {
+                _handleFatalError(e);
+            }
         }
     }
 
@@ -141,11 +146,16 @@ public class ModelSelectionActivity extends ListActivity {
         String selection = (String) listView.getItemAtPosition(position);
         if (_state == ModelSelectionState.SelectingModel) {
             setContentView(R.layout.layout_list);
-
             _modelUrl = selection;
             _state = ModelSelectionState.SelectingLayout;
-            _setupList();
+
+            try {
+                _setupList();
+            } catch (Throwable e) {
+                _handleFatalError(e);
+            }
         } else if (_state == ModelSelectionState.SelectingLayout) {
+
             // Pass parameters into the intent.
             Intent intent = new Intent(getApplicationContext(),
                     SimulationActivity.class);
@@ -154,7 +164,6 @@ public class ModelSelectionActivity extends ListActivity {
             intent.putExtra("password", getIntent().getStringExtra("password"));
             intent.putExtra("modelUrl", _modelUrl);
             intent.putExtra("layoutUrl", selection);
-
             startActivity(intent);
         }
     }
@@ -167,53 +176,43 @@ public class ModelSelectionActivity extends ListActivity {
      *  @param username Username used for basic authentication.
      *  @param password Password used for basic authentication.
      *  @exception IllegalStateException If there was a problem setting up the servlet proxy. 
+     * @throws MalformedURLException 
      */
     private void _setupProxy(String address, String username, String password)
-            throws IllegalStateException {
+            throws IllegalStateException, MalformedURLException {
         HessianProxyFactory factory = new HessianProxyFactory();
         factory.setHessian2Reply(false);
         factory.setUser(username);
         factory.setPassword(password);
-
-        try {
-            _proxy = factory.create(IServerManager.class, address,
-                    getClassLoader());
-        } catch (MalformedURLException e) {
-            throw new IllegalStateException("Unable to connect to server.", e);
-        }
+        _proxy = factory
+                .create(IServerManager.class, address, getClassLoader());
     }
 
     /** Set up the screen controls.
+     * @throws IllegalActionException 
+     * @throws IOException 
+     * @throws UnknownHostException 
      */
-    private void _setupList() {
-        try {
-            if (_state == ModelSelectionState.SelectingModel) {
-                setListAdapter(new UrlAdapter(this, R.layout.model_list_item,
-                        R.id.model_item, _proxy.getModelListing()));
-            } else {
-                // Determine if the selected host is still reachable.
-                //                String serverAddress = getIntent().getStringExtra("address");
-                //                if (!InetAddress.getByName(serverAddress).isReachable(2500)) {
-                //                    DialogFactory.getError(
-                //                            this,
-                //                            "Connection Error",
-                //                            "The server could not be reached at: "
-                //                                    + serverAddress).show();
-                //
-                //                    // Go to the previous activity.
-                //                    super.onBackPressed();
-                //                    return;
-                //                }
+    private void _setupList() throws IllegalActionException,
+            UnknownHostException, IOException {
+        if (_state == ModelSelectionState.SelectingModel) {
+            setListAdapter(new UrlAdapter(this, R.layout.model_list_item,
+                    R.id.model_item, _proxy.getModelListing()));
+        } else {
+            // Determine if the selected host is still reachable.
+            String serverAddress = getIntent().getStringExtra("address");
+            //            if (!InetAddress.getByName(serverAddress).isReachable(2500)) {
+            //                DialogFactory.getError(this, "Connection Error",
+            //                        "The server could not be reached at: " + serverAddress)
+            //                        .show();
+            //
+            //                // Go to the previous activity.
+            //                super.onBackPressed();
+            //                return;
+            //            }
 
-                setListAdapter(new UrlAdapter(this, R.layout.layout_list_item,
-                        R.id.layout_item, _proxy.getLayoutListing(_modelUrl)));
-            }
-        } catch (Exception e) {
-            Log.e(getClass().getName(), e.getMessage());
-            Toast.makeText(getBaseContext(), "Unable to load the "
-                    + (_state == ModelSelectionState.SelectingModel ? "model"
-                            : "layout") + " list.", Toast.LENGTH_SHORT);
-            onBackPressed();
+            setListAdapter(new UrlAdapter(this, R.layout.layout_list_item,
+                    R.id.layout_item, _proxy.getLayoutListing(_modelUrl)));
         }
     }
 
@@ -280,7 +279,6 @@ public class ModelSelectionActivity extends ListActivity {
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             String url = getItem(position);
-
             if (convertView == null) {
                 convertView = _inflater.inflate(_resource, null);
             }
@@ -311,4 +309,32 @@ public class ModelSelectionActivity extends ListActivity {
          */
         private LayoutInflater _inflater;
     }
+
+    private synchronized void _handleFatalError(final Throwable throwable) {
+        Log.e(getClass().getName(), throwable.getMessage(), throwable);
+        if (!_handlingFatalError) {
+            _handlingFatalError = true;
+            runOnUiThread(new Runnable() {
+
+                @Override
+                public void run() {
+                    DialogFactory.getError(
+                            ModelSelectionActivity.this,
+                            "Unhandled Exception",
+                            "The execution would now terminate due to an unhandled exception \n"
+                                    + throwable.getMessage()
+                                    + "\n"
+                                    + KernelException
+                                            .stackTraceToString(throwable))
+                            .show();
+                    finish();
+                }
+            });
+        }
+    }
+
+    /**
+     * This flag is used to prevent other fatal errors from showing up if there is one currently being handled.
+     */
+    private boolean _handlingFatalError = false;
 }

@@ -41,8 +41,8 @@ import android.widget.FrameLayout;
  *  wishes to overlaying the output of one actor over another.
  *
  *  @author Justin Killian
- *  @version $Id: PortableView.java 152 2011-09-12 17:59:15Z ahuseyno $
- *  @since Ptolemy II 8.0
+ *  @version $Id: PortableView.java 168 2011-11-20 19:26:08Z jkillian $
+ *  @since Ptolemy II 8.1
  *  @Pt.ProposedRating Red (jkillian)
  *  @Pt.AcceptedRating Red (jkillian)
  */

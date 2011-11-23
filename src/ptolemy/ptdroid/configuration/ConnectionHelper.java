@@ -42,8 +42,8 @@ import android.util.Log;
 /** Control the persistent database operations for the Android application.
  *   
  *  @author Peter Foldes
- *  @version $Id: ConnectionHelper.java 92 2011-06-24 04:42:19Z pdf $
- *  @since Ptolemy II 8.0
+ *  @version $Id: ConnectionHelper.java 167 2011-11-20 19:24:03Z jkillian $
+ *  @since Ptolemy II 8.1
  *  @Pt.ProposedRating Red (pdf)
  *  @Pt.AcceptedRating Red (pdf)
  */

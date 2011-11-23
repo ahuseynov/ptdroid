@@ -224,7 +224,7 @@ import android.graphics.RectF;
  </ul>
 
  @author Edward A. Lee, Christopher Brooks, Contributor: Tom Peachey, Bert Rodiers
- @version $Id: Plot.java 152 2011-09-12 17:59:15Z ahuseyno $
+ @version $Id: Plot.java 171 2011-11-20 19:45:16Z ahuseyno $
  @since Ptolemy II 0.2
  @Pt.ProposedRating Yellow (cxh)
  @Pt.AcceptedRating Yellow (cxh)
@@ -3436,7 +3436,7 @@ public class Plot extends PlotBox implements PlotInterface {
     private boolean _connected = true;
 
     /** @serial Give the diameter of a point for efficiency. */
-    private int _diameter = 6;
+//    private int _diameter = 6;
 
     /** The initial default width.
      */

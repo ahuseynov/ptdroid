@@ -45,12 +45,11 @@ import android.widget.Spinner;
 /** Represents a spinner widget to be placed on the Android user interface.
 *
 *  @author Ishwinder Singh
-*  @version $Id: SpinnerWidget.java 152 2011-09-12 17:59:15Z ahuseyno $
+*  @version $Id: SpinnerWidget.java 168 2011-11-20 19:26:08Z jkillian $
 *  @since Ptolemy II 8.1
 *  @Pt.ProposedRating Red (ishwinde)
 *  @Pt.AcceptedRating Red (ishwinde)
 */
-
 public class SpinnerWidget implements PortablePlaceable,
         PtolemyAndroidWidget<String, OnItemSelectedListener> {
 
@@ -112,8 +111,11 @@ public class SpinnerWidget implements PortablePlaceable,
      *  @param value The value of the choice selected.
      */
     public void setValue(String value) {
-        _spinner.setSelection(((ArrayAdapter<String>) _spinner.getAdapter())
-                .getPosition(_valuesToChoices.get(value)));
+        int position = ((ArrayAdapter<String>) _spinner.getAdapter())
+                .getPosition(_valuesToChoices.get(value));
+        if (position >= 0) {
+            _spinner.setSelection(position);
+        }
     }
 
     /** Get the value represented by the spinner based on its position.

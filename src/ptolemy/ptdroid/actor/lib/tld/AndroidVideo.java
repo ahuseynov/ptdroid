@@ -1,8 +1,6 @@
 package ptolemy.ptdroid.actor.lib.tld;
 
 import java.io.ByteArrayOutputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 
 import ptolemy.actor.NoRoomException;
@@ -11,8 +9,9 @@ import ptolemy.data.ArrayToken;
 import ptolemy.data.UnsignedByteToken;
 import ptolemy.data.type.BaseType;
 import ptolemy.kernel.util.IllegalActionException;
-import ptserver.actor.lib.Video;
-import ptserver.actor.lib.VideoInterface;
+import ptserver.actor.lib.tld.Video;
+import ptserver.actor.lib.tld.VideoInterface;
+import ptserver.data.ByteArrayToken;
 import android.graphics.ImageFormat;
 import android.graphics.Rect;
 import android.graphics.YuvImage;
@@ -33,7 +32,6 @@ public class AndroidVideo implements VideoInterface {
     private byte[] data;
     private Parameters parameters;
 
-    @Override
     public void init(Video video) {
         this.video = video;
     }
@@ -66,7 +64,7 @@ public class AndroidVideo implements VideoInterface {
                         System.out.println(camera.getParameters()
                                 .getSupportedPreviewFormats());
                         parameters = camera.getParameters();
-                        //parameters.setPreviewSize(320, 240);
+                        parameters.setPreviewSize(320, 240);
                         parameters.setPreviewFrameRate(5);
                         camera.setParameters(parameters);
                         camera.setPreviewDisplay(holder);
@@ -113,7 +111,6 @@ public class AndroidVideo implements VideoInterface {
         }
     }
 
-    @Override
     public void fire() throws IllegalActionException {
         byte[] d;
         synchronized (this) {
@@ -135,17 +132,15 @@ public class AndroidVideo implements VideoInterface {
         im.compressToJpeg(r, parameters.getJpegQuality(), baos);
 
         byte[] result = baos.toByteArray();
-        UnsignedByteToken[] tokens = new UnsignedByteToken[result.length];
-        for (int i = 0; i < result.length; i++) {
-            tokens[i] = new UnsignedByteToken(result[i]);
-        }
+    
 
         try {
             video._output.send(0,
-                    new ArrayToken(BaseType.UNSIGNED_BYTE, tokens));
+                    new ByteArrayToken(result));
         } catch (NoRoomException e) {
+            e.printStackTrace();
         } catch (IllegalActionException e) {
+            e.printStackTrace();
         }
     }
-
 }

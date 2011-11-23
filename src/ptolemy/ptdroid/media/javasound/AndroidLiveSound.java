@@ -56,7 +56,7 @@ import android.media.MediaRecorder.AudioSource;
  
  
  @author Brian K. Vogel and Neil E. Turner and Steve Neuendorffer, Edward A. Lee, Ishwinder Singh Contributor: Dennis Geurts 
- @version $Id: AndroidLiveSound.java 154 2011-09-30 19:48:35Z ahuseyno $
+ @version $Id: AndroidLiveSound.java 161 2011-11-07 05:33:35Z ahuseyno $
  @since Ptolemy II 8.1
  @Pt.ProposedRating Red (ishwinde)
  @Pt.AcceptedRating Red (ishwinde)
@@ -681,32 +681,33 @@ public class AndroidLiveSound extends LiveSoundCommon implements
                 // Note that it is ok to fall through the cases here (I think).
                 switch (_bytesPerSample) {
                 case 4:
-                    result += (byteArray[j + 3] & 0xff);
+                    result |= (byteArray[j + 3] & 0xff);
                     result <<= 8;
-                    result += (byteArray[j + 2] & 0xff);
+                    result |= (byteArray[j + 2] & 0xff);
                     result <<= 8;
-                    result += (byteArray[j + 1] & 0xff);
+                    result |= (byteArray[j + 1] & 0xff);
                     result <<= 8;
-                    result += (byteArray[j] & 0xff);
+                    result |= (byteArray[j] & 0xff);
                     break;
                 case 3:
-                    result += (byteArray[j + 2] & 0xff);
+                    result |= (byteArray[j + 2] & 0xff);
                     result <<= 8;
-                    result += (byteArray[j + 1] & 0xff);
+                    result |= (byteArray[j + 1] & 0xff);
                     result <<= 8;
-                    result += (byteArray[j] & 0xff);
+                    result |= (byteArray[j] & 0xff);
                     break;
                 case 2:
-                    result += (byteArray[j + 1] & 0xff);
+                    result |= (byteArray[j + 1] & 0xff);
                     result <<= 8;
-                    result += (byteArray[j] & 0xff);
+                    result |= (byteArray[j] & 0xff);
+                    result -= 32768;
                     break;
                 case 1:
-                    result += (byteArray[j] & 0xff);
+                    result |= (byteArray[j] & 0xff);
                     break;
                 }
                 doubleArray[currChannel][currSamp] = result
-                        * _maxSampleReciprocal;
+                        * _maxSampleReciprocal - 1;
             }
         }
     }
@@ -811,12 +812,34 @@ public class AndroidLiveSound extends LiveSoundCommon implements
      */
     private void _startCapture() throws IOException {
         //AudioFormat format = new AudioFormat();
-
+        int channelConfig;
+        switch (_channels) {
+        case 1:
+            channelConfig = AudioFormat.CHANNEL_IN_MONO;
+            break;
+        case 2:
+            channelConfig = AudioFormat.CHANNEL_IN_STEREO;
+            break;
+        default:
+            throw new IllegalStateException("Unsupported channel config "
+                    + _channels);
+        }
+        int audioFormat;
+        switch (_bitsPerSample) {
+        case 16:
+            audioFormat = AudioFormat.ENCODING_PCM_16BIT;
+            break;
+        case 8:
+            audioFormat = AudioFormat.ENCODING_PCM_8BIT;
+            break;
+        default:
+            throw new IllegalStateException("Unsupported audio format "
+                    + _bitsPerSample);
+        }
+        
         try {
             _targetLine = new AudioRecord(AudioSource.MIC, (int) _sampleRate,
-                    _channels, _bitsPerSample, AudioRecord.getMinBufferSize(
-                            (int) _sampleRate, _channels, _bitsPerSample) * 10);
-
+                    channelConfig, audioFormat, _bufferSize * _bytesPerSample * _channels); 
         } catch (IllegalArgumentException ex) {
             // FIXME make the exception message better (include audio format)
             IOException exception = new IOException(
@@ -868,8 +891,8 @@ public class AndroidLiveSound extends LiveSoundCommon implements
             }
             _sourceLine = new AudioTrack(AudioManager.STREAM_SYSTEM,
                     (int) _sampleRate, channelConfig, audioFormat,
-                    AudioTrack.getMinBufferSize((int) _sampleRate,
-                            channelConfig, audioFormat), AudioTrack.MODE_STREAM);
+                    _bufferSize * _bytesPerSample * _channels,
+                    AudioTrack.MODE_STREAM); 
         } catch (IllegalArgumentException ex) {
             IOException exception = new IOException(
                     "Incorrect argument, possible encodings for\n" + format

@@ -1,5 +1,5 @@
 /*
- Initializer of the PtolemyModule with Java SE specific interface to
+ Initializer of the PtolemyModule with Android-specific interface to
  implementation mappings.
  
  Copyright (c) 2011 The Regents of the University of California.
@@ -36,14 +36,14 @@ import ptolemy.actor.injection.PtolemyInjector;
 import ptolemy.actor.injection.PtolemyModule;
 
 ///////////////////////////////////////////////////////////////////
-//// PtolemyModuleJavaSEInitializer
+//// PtolemyModuleAndroidInitializer
 /**
- * Initializer of the PtolemyModule with Android specific interface to
+ * Initializer of the PtolemyModule with Android-specific interface to
  * implementation mappings.  The module uses ptolemy.actor.JavaSEActorModule.properties
  * file to initialize the PtolemyModule.
  * @author Anar Huseynov
- * @version $Id: PtolemyModuleAndroidInitializer.java 158 2011-10-09 15:38:46Z jkillian $ 
- * @since Ptolemy II 8.0
+ * @version $Id: PtolemyModuleAndroidInitializer.java 168 2011-11-20 19:26:08Z jkillian $ 
+ * @since Ptolemy II 8.1
  * @Pt.ProposedRating Red (ahuseyno)
  * @Pt.AcceptedRating Red (ahuseyno)
  */
@@ -54,7 +54,7 @@ public class PtolemyModuleAndroidInitializer implements Initializer {
      * @see ptolemy.actor.injection.ActorModuleInitializer.Initializer#initialize()
      */
     @Override
-    public void initialize() {
+    public synchronized void initialize() {
         PtolemyInjector.createInjector(PTOLEMY_MODULES);
     }
 
