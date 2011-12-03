@@ -2,6 +2,7 @@ package ptolemy.ptdroid.actor.lib.tld;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import ptolemy.actor.NoRoomException;
 import ptolemy.actor.injection.PortableContainer;
@@ -27,8 +28,11 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceHolder.Callback;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
 public class AndroidVideo implements VideoInterface {
@@ -42,6 +46,13 @@ public class AndroidVideo implements VideoInterface {
     private Parameters parameters;
     private int videoWidth = 320;
     private int videoHeight = 240;
+    private ConcurrentLinkedQueue<byte[]> images = new ConcurrentLinkedQueue<byte[]>();
+    private boolean recording = false;
+    private boolean training = false;
+    private static int MAX_TRAINING = 500;
+    private Button btnRecord;
+    private Button btnStop;
+    private Button btnTrain;
 
     public void init(Video video) {
         this.video = video;
@@ -50,13 +61,69 @@ public class AndroidVideo implements VideoInterface {
     public void place(PortableContainer container) {
         ViewGroup viewGroup = (ViewGroup) (container.getPlatformContainer());
         if (view == null) {
+            LinearLayout linearLayout = new LinearLayout(viewGroup.getContext());
+            FrameLayout frameLayout = new FrameLayout(viewGroup.getContext());
+            linearLayout.setOrientation(LinearLayout.VERTICAL);
+            viewGroup.addView(linearLayout);
+            linearLayout.addView(frameLayout, new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.FILL_PARENT, 500));
+            LinearLayout buttons = new LinearLayout(viewGroup.getContext());
+            buttons.setOrientation(LinearLayout.HORIZONTAL);
+
+            linearLayout.addView(buttons, new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.FILL_PARENT, 50));
+
+            btnRecord = new Button(viewGroup.getContext());
+            btnStop = new Button(viewGroup.getContext());
+            btnTrain = new Button(viewGroup.getContext());
+
+            btnRecord.setText("Record");
+            buttons.addView(btnRecord, new LinearLayout.LayoutParams(100, 50));
+            btnRecord.setOnClickListener(new OnClickListener() {
+
+                @Override
+                public void onClick(View v) {
+                    recording = true;
+                    training = false;
+                    images.clear();
+                    btnRecord.setEnabled(false);
+                    btnStop.setEnabled(true);
+                    btnTrain.setEnabled(false);
+                }
+            });
+
+            btnStop.setEnabled(false);
+            btnStop.setText("Stop");
+            btnStop.setOnClickListener(new OnClickListener() {
+
+                @Override
+                public void onClick(View v) {
+                    recording = false;
+                    btnRecord.setEnabled(true);
+                    btnStop.setEnabled(false);
+                    btnTrain.setEnabled(true);
+                }
+            });
+            buttons.addView(btnStop, new LinearLayout.LayoutParams(100, 50));
+
+            btnTrain.setText("Train");
+            btnTrain.setOnClickListener(new OnClickListener() {
+
+                @Override
+                public void onClick(View v) {
+                    training = true;
+                    btnTrain.setEnabled(false);
+                }
+            });
+            btnTrain.setEnabled(false);
+            buttons.addView(btnTrain, new LinearLayout.LayoutParams(100, 50));
+
             view = new SurfaceView(viewGroup.getContext());
             box = new Box(viewGroup.getContext());
-
             int lHeight = LinearLayout.LayoutParams.FILL_PARENT;
             int lWidth = LinearLayout.LayoutParams.FILL_PARENT;
-            viewGroup.addView(view, lHeight, lWidth);
-            viewGroup.addView(box);
+            frameLayout.addView(view, lHeight, lWidth);
+            frameLayout.addView(box, lHeight, lWidth);
             view.setOnTouchListener(box);
             //        view.setBackgroundColor(Color.WHITE);
             view.getHolder().addCallback(new Callback() {
@@ -79,7 +146,7 @@ public class AndroidVideo implements VideoInterface {
                                 .getSupportedPreviewFormats());
                         parameters = camera.getParameters();
                         parameters.setPreviewSize(videoWidth, videoHeight);
-                        parameters.setPreviewFrameRate(10);
+                        parameters.setPreviewFrameRate(15);
                         parameters.setJpegQuality(25);
                         camera.setParameters(parameters);
                         camera.setPreviewDisplay(holder);
@@ -91,11 +158,18 @@ public class AndroidVideo implements VideoInterface {
                                     Camera camera) {
                                 box.invalidate();
                                 synchronized (AndroidVideo.this) {
-                                    //if (c % 10 == 0) {
                                     sent = false;
                                     AndroidVideo.this.data = data;
                                     AndroidVideo.this.notifyAll();
-                                    //}
+                                    if (recording) {
+                                        images.add(data);
+                                        if (images.size() > MAX_TRAINING) {
+                                            recording = false;
+                                            btnRecord.setEnabled(true);
+                                            btnStop.setEnabled(false);
+                                            btnTrain.setEnabled(true);
+                                        }
+                                    }
                                 }
                             }
                         });
@@ -113,31 +187,51 @@ public class AndroidVideo implements VideoInterface {
     }
 
     public void initialize() throws IllegalActionException {
-
     }
 
     public void stop() {
-        if (camera != null) {
-            camera.stopPreview();
-            camera.setPreviewCallback(null);
-            camera.release();
-            camera = null;
-        }
+        training = false;
     }
 
     public void fire() throws IllegalActionException {
-        byte[] d;
-        synchronized (this) {
-            d = this.data;
-            while (sent) {
+        byte[] d = null;
+        if (training) {
+            byte[] image = images.poll();
+            if (image != null) {
+                d = image;
                 try {
-                    this.wait();
+                    Thread.sleep(100);
                 } catch (InterruptedException e) {
                 }
+            } else {
+                training = false;
+                btnTrain.setEnabled(false);
             }
-            sent = true;
         }
-        YuvImage im = new YuvImage(d, ImageFormat.NV21,
+        if (!training) {
+            synchronized (this) {
+                d = this.data;
+                while (sent) {
+                    try {
+                        this.wait();
+                    } catch (InterruptedException e) {
+                    }
+                }
+                sent = true;
+            }
+        }
+        byte[] result = toJpeg(d);
+        try {
+            video._output.send(0, new ByteArrayToken(result));
+        } catch (NoRoomException e) {
+            e.printStackTrace();
+        } catch (IllegalActionException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private byte[] toJpeg(byte[] data) {
+        YuvImage im = new YuvImage(data, ImageFormat.NV21,
                 parameters.getPreviewSize().width,
                 parameters.getPreviewSize().height, null);
         Rect r = new Rect(0, 0, parameters.getPreviewSize().width,
@@ -146,14 +240,7 @@ public class AndroidVideo implements VideoInterface {
         im.compressToJpeg(r, parameters.getJpegQuality(), baos);
 
         byte[] result = baos.toByteArray();
-
-        try {
-            video._output.send(0, new ByteArrayToken(result));
-        } catch (NoRoomException e) {
-            e.printStackTrace();
-        } catch (IllegalActionException e) {
-            e.printStackTrace();
-        }
+        return result;
     }
 
     public void updateBoundingBox(float x1, float y1, float x2, float y2) {
@@ -176,12 +263,14 @@ public class AndroidVideo implements VideoInterface {
         @Override
         protected void onDraw(Canvas canvas) {
             super.onDraw(canvas);
-            Paint paint = new Paint();
-            paint.setStyle(Style.STROKE);
-            paint.setStrokeWidth(5);
-            paint.setARGB(255, 255, 0, 0);
-            RectF rect = new RectF(x1, y1, x2, y2);
-            canvas.drawRect(rect, paint);
+            if (!training) {
+                Paint paint = new Paint();
+                paint.setStyle(Style.STROKE);
+                paint.setStrokeWidth(5);
+                paint.setARGB(255, 255, 0, 0);
+                RectF rect = new RectF(x1, y1, x2, y2);
+                canvas.drawRect(rect, paint);
+            }
         }
 
         @Override
@@ -201,21 +290,26 @@ public class AndroidVideo implements VideoInterface {
                     if (y2 < event.getY(i))
                         y2 = event.getY(i);
                 }
+                sendBoundingBoxCoordinates();
             }
-            CompositeEntity container = (CompositeEntity) video.getContainer();
-            StringAttribute bb = (StringAttribute) container
-                    .getAttribute("bb.expression");
 
-            float hratio = (videoWidth / (float) view.getWidth());
-            float vratio = (videoHeight / (float) view.getHeight());
-            try {
-                bb.setExpression(String.format("[%f, %f, %f, %f]", x1 * hratio,
-                        y1 * hratio, x2 * vratio, y2 * vratio));
-                bb.validate();
-            } catch (IllegalActionException e) {
-                throw new IllegalStateException(e);
-            }
             return true;
+        }
+    }
+
+    private void sendBoundingBoxCoordinates() {
+        CompositeEntity container = (CompositeEntity) video.getContainer();
+        StringAttribute bb = (StringAttribute) container
+                .getAttribute("bb.expression");
+
+        float hratio = (videoWidth / (float) view.getWidth());
+        float vratio = (videoHeight / (float) view.getHeight());
+        try {
+            bb.setExpression(String.format("[%f, %f, %f, %f]", box.x1 * hratio,
+                    box.y1 * hratio, box.x2 * vratio, box.y2 * vratio));
+            bb.validate();
+        } catch (IllegalActionException e) {
+            throw new IllegalStateException(e);
         }
     }
 }
