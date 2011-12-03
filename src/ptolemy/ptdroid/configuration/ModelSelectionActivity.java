@@ -64,7 +64,7 @@ import com.caucho.hessian.client.HessianProxyFactory;
  *  layouts.
  *   
  *  @author Peter Foldes
- *  @version $Id: ModelSelectionActivity.java 174 2011-11-21 04:11:08Z jkillian $
+ *  @version $Id: ModelSelectionActivity.java 177 2011-12-03 00:21:51Z ahuseyno $
  *  @since Ptolemy II 8.1
  *  @Pt.ProposedRating Red (pdf)
  *  @Pt.AcceptedRating Red (pdf)
@@ -181,6 +181,7 @@ public class ModelSelectionActivity extends ListActivity {
     private void _setupProxy(String address, String username, String password)
             throws IllegalStateException, MalformedURLException {
         HessianProxyFactory factory = new HessianProxyFactory();
+        factory.setReadTimeout(10000);
         factory.setHessian2Reply(false);
         factory.setUser(username);
         factory.setPassword(password);

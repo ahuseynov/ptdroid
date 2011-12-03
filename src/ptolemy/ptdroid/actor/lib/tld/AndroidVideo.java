@@ -5,10 +5,9 @@ import java.io.IOException;
 
 import ptolemy.actor.NoRoomException;
 import ptolemy.actor.injection.PortableContainer;
-import ptolemy.data.ArrayToken;
-import ptolemy.data.UnsignedByteToken;
-import ptolemy.data.type.BaseType;
+import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.IllegalActionException;
+import ptolemy.kernel.util.StringAttribute;
 import ptserver.actor.lib.tld.Video;
 import ptserver.actor.lib.tld.VideoInterface;
 import ptserver.data.ByteArrayToken;
@@ -16,62 +15,21 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.ImageFormat;
 import android.graphics.Paint;
+import android.graphics.Paint.Style;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.YuvImage;
-import android.graphics.Paint.Style;
 import android.hardware.Camera;
 import android.hardware.Camera.Parameters;
 import android.hardware.Camera.PreviewCallback;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceHolder.Callback;
-import android.view.View.OnTouchListener;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-
-class Box extends View implements OnTouchListener {
-	int k;
-	float x1, y1, x2, y2;
-
-	public Box(Context context) {
-		super(context);
-	}
-	
-	@Override
-	protected void onDraw(Canvas canvas) {
-		super.onDraw(canvas);
-		Paint paint = new Paint();
-		paint.setStyle(Style.STROKE);
-		paint.setStrokeWidth(5);
-		paint.setARGB(255, 255, 0, 0);
-		RectF rect = new RectF(x1, y1, x2, y2);
-		canvas.drawRect(rect, paint);
-	}
-
-	@Override
-	public boolean onTouch(View v, MotionEvent event) {
-		if(event.getPointerCount() > 1) {
-			x1 = event.getX(0);
-			y1 = event.getY(0);
-			x2 = event.getX(1);
-			y2 = event.getY(1);
-			for(int i=0; i<event.getPointerCount(); i++) {
-				if(x1 > event.getX(i))
-					x1 = event.getX(i);
-				if(y1 > event.getY(i))
-					y1 = event.getY(i);
-				if(x2 < event.getX(i))
-					x2 = event.getX(i);
-				if(y2 < event.getY(i))
-					y2 = event.getY(i);
-			}
-		}
-		return true;
-	}
-}
 
 public class AndroidVideo implements VideoInterface {
 
@@ -82,6 +40,8 @@ public class AndroidVideo implements VideoInterface {
     private boolean sent;
     private byte[] data;
     private Parameters parameters;
+    private int videoWidth = 320;
+    private int videoHeight = 240;
 
     public void init(Video video) {
         this.video = video;
@@ -118,26 +78,24 @@ public class AndroidVideo implements VideoInterface {
                         System.out.println(camera.getParameters()
                                 .getSupportedPreviewFormats());
                         parameters = camera.getParameters();
-                        parameters.setPreviewSize(320, 240);
-                        parameters.setPreviewFrameRate(5);
+                        parameters.setPreviewSize(videoWidth, videoHeight);
+                        parameters.setPreviewFrameRate(10);
                         parameters.setJpegQuality(25);
                         camera.setParameters(parameters);
                         camera.setPreviewDisplay(holder);
                         camera.startPreview();
                         camera.setPreviewCallback(new PreviewCallback() {
 
-                            int c = 0;
-
                             @Override
                             public void onPreviewFrame(byte[] data,
                                     Camera camera) {
-                        		box.invalidate();
+                                box.invalidate();
                                 synchronized (AndroidVideo.this) {
-                                    if (c % 5 < 3) {
-                                        sent = false;
-                                        AndroidVideo.this.data = data;
-                                        AndroidVideo.this.notifyAll();
-                                    }
+                                    //if (c % 10 == 0) {
+                                    sent = false;
+                                    AndroidVideo.this.data = data;
+                                    AndroidVideo.this.notifyAll();
+                                    //}
                                 }
                             }
                         });
@@ -188,23 +146,76 @@ public class AndroidVideo implements VideoInterface {
         im.compressToJpeg(r, parameters.getJpegQuality(), baos);
 
         byte[] result = baos.toByteArray();
-    
 
         try {
-            video._output.send(0,
-                    new ByteArrayToken(result));
+            video._output.send(0, new ByteArrayToken(result));
         } catch (NoRoomException e) {
             e.printStackTrace();
         } catch (IllegalActionException e) {
             e.printStackTrace();
         }
     }
-    
+
     public void updateBoundingBox(float x1, float y1, float x2, float y2) {
-    	float ratio = (float)2.5;
-    	box.x1 = x1*ratio;
-    	box.x2 = x2*ratio;
-    	box.y1 = y1*ratio;
-    	box.y2 = y2*ratio;
+        float hratio = ((float) view.getWidth()) / videoWidth;
+        float vratio = ((float) view.getHeight()) / videoHeight;
+        box.x1 = x1 * hratio;
+        box.x2 = x2 * hratio;
+        box.y1 = y1 * vratio;
+        box.y2 = y2 * vratio;
+    }
+
+    class Box extends View implements OnTouchListener {
+        int k;
+        float x1, y1, x2, y2;
+
+        public Box(Context context) {
+            super(context);
+        }
+
+        @Override
+        protected void onDraw(Canvas canvas) {
+            super.onDraw(canvas);
+            Paint paint = new Paint();
+            paint.setStyle(Style.STROKE);
+            paint.setStrokeWidth(5);
+            paint.setARGB(255, 255, 0, 0);
+            RectF rect = new RectF(x1, y1, x2, y2);
+            canvas.drawRect(rect, paint);
+        }
+
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+            if (event.getPointerCount() > 1) {
+                x1 = event.getX(0);
+                y1 = event.getY(0);
+                x2 = event.getX(1);
+                y2 = event.getY(1);
+                for (int i = 0; i < event.getPointerCount(); i++) {
+                    if (x1 > event.getX(i))
+                        x1 = event.getX(i);
+                    if (y1 > event.getY(i))
+                        y1 = event.getY(i);
+                    if (x2 < event.getX(i))
+                        x2 = event.getX(i);
+                    if (y2 < event.getY(i))
+                        y2 = event.getY(i);
+                }
+            }
+            CompositeEntity container = (CompositeEntity) video.getContainer();
+            StringAttribute bb = (StringAttribute) container
+                    .getAttribute("bb.expression");
+
+            float hratio = (videoWidth / (float) view.getWidth());
+            float vratio = (videoHeight / (float) view.getHeight());
+            try {
+                bb.setExpression(String.format("[%f, %f, %f, %f]", x1 * hratio,
+                        y1 * hratio, x2 * vratio, y2 * vratio));
+                bb.validate();
+            } catch (IllegalActionException e) {
+                throw new IllegalStateException(e);
+            }
+            return true;
+        }
     }
 }

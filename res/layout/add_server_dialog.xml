@@ -21,7 +21,6 @@
 				android:id="@+id/server_address"
 				android:text=""
 				android:inputType="textNoSuggestions"
-				android:gravity="right"
 				android:padding="3dip"
 				android:layout_height="40dip" />
 	    </TableRow>
@@ -34,7 +33,6 @@
 				android:id="@+id/server_port"
 				android:text=""
 				android:inputType="number"
-				android:gravity="right"
 				android:padding="3dip"
 				android:layout_height="40dip" />
     	</TableRow>
@@ -47,7 +45,6 @@
 				android:id="@+id/server_username"
 				android:text=""
 				android:inputType="textNoSuggestions"
-				android:gravity="right"
 				android:padding="3dip"
 				android:layout_height="40dip"/>
     	</TableRow>
@@ -60,7 +57,6 @@
 				android:id="@+id/server_password"
 				android:text=""
 				android:inputType="textPassword"
-				android:gravity="right"
 				android:padding="3dip"
 				android:layout_height="40dip" />
 	    </TableRow>

@@ -89,7 +89,7 @@ import com.caucho.hessian.client.HessianProxyFactory;
  *  a simulation as well as view the visual output of graphical sink actors.
  *
  *  @author Justin Killian
- *  @version $Id: SimulationActivity.java 171 2011-11-20 19:45:16Z ahuseyno $
+ *  @version $Id: SimulationActivity.java 177 2011-12-03 00:21:51Z ahuseyno $
  *  @since Ptolemy II 8.0
  *  @Pt.ProposedRating Red (jkillian)
  *  @Pt.AcceptedRating Red (jkillian)
@@ -201,6 +201,7 @@ public class SimulationActivity extends Activity implements
     private void _setupProxy(String address, String username, String password)
             throws IllegalStateException, MalformedURLException {
         HessianProxyFactory factory = new HessianProxyFactory();
+        factory.setReadTimeout(10000);
         factory.setHessian2Reply(false);
         factory.setUser(username);
         factory.setPassword(password);
